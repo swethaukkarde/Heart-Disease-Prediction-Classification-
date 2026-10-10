@@ -155,36 +155,41 @@ except Exception as e:
 # ==========================================
 # HERO SECTION
 # ==========================================
+
+# ==========================================
+# HERO SECTION
+# ==========================================
 hero_text, hero_image = st.columns(
     [1.15, 1],
     vertical_alignment="center"
 )
 
 with hero_text:
-    st.markdown("""
-    <div style="padding: 20px 5px;">
+    st.markdown(
+        """
         <h1 style="
             color: #153E75;
             font-size: 36px;
             font-weight: 750;
-            line-height: 1.3;
         ">
             ❤️ Heart Disease Prediction
         </h1>
+        """,
+        unsafe_allow_html=True
+    )
 
-        <div class="hero-description">
-            Your heart continuously pumps blood, supplying
-            oxygen and essential nutrients throughout your body.
-            <br><br>
-            Maintaining heart health through healthy habits
-            and regular medical checkups can help reduce
-            cardiovascular risks.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.write(
+        "Your heart continuously pumps blood, supplying oxygen "
+        "and essential nutrients throughout your body."
+    )
+
+    st.write(
+        "Maintaining heart health through healthy habits and "
+        "regular medical checkups can help reduce cardiovascular risks."
+    )
 
 with hero_image:
-    image_path = BASE_DIR / "heart_banner.png"
+    image_path = Path(__file__).parent / "heart_banner.png"
 
     if image_path.exists():
         st.image(
@@ -192,12 +197,10 @@ with hero_image:
             use_container_width=True
         )
     else:
-        st.info(
-            "Upload heart_banner.png to your GitHub repository "
-            "to display the heart image."
-        )
+        st.info("Upload heart_banner.png to your GitHub repository.")
 
 st.divider()
+
 
 
 # ==========================================
