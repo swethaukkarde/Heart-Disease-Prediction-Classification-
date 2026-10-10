@@ -13,8 +13,10 @@ st.set_page_config(
     layout="wide"
 )
 
+BASE_DIR = Path(__file__).parent
+
 # ==========================================
-# LIGHT THEME AND CSS
+# LIGHT THEME
 # ==========================================
 st.markdown("""
 <style>
@@ -38,7 +40,7 @@ h1, h2, h3 {
     color: #153E75 !important;
 }
 
-/* Text and labels */
+/* All labels and normal text */
 .stApp p,
 .stApp label,
 .stApp [data-testid="stWidgetLabel"] p,
@@ -46,17 +48,9 @@ h1, h2, h3 {
     color: #243247 !important;
 }
 
-/* Hero section */
-.hero-title {
-    color: #153E75;
-    font-size: 36px;
-    font-weight: 750;
-    line-height: 1.3;
-    margin-bottom: 16px;
-}
-
+/* Hero description */
 .hero-description {
-    color: #43566E;
+    color: #43566E !important;
     font-size: 16px;
     line-height: 1.8;
 }
@@ -69,7 +63,14 @@ div[data-testid="stForm"] {
     padding: 24px;
 }
 
-/* Dropdown fields */
+/* Input labels */
+div[data-testid="stWidgetLabel"] p {
+    color: #243247 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+/* Dropdown controls */
 div[data-baseweb="select"] > div {
     background-color: #FFFFFF !important;
     border: 1px solid #CBD5E1 !important;
@@ -81,7 +82,7 @@ div[data-baseweb="select"] input {
     color: #243247 !important;
 }
 
-/* Dropdown menu */
+/* Dropdown menus */
 div[data-baseweb="popover"],
 div[data-baseweb="menu"],
 ul[role="listbox"] {
@@ -120,7 +121,7 @@ div[data-testid="stFormSubmitButton"] > button:hover {
     color: #FFFFFF !important;
 }
 
-/* Result panels */
+/* Alerts */
 div[data-testid="stAlert"] {
     border-radius: 10px;
 }
@@ -134,16 +135,13 @@ footer {
 
 
 # ==========================================
-# LOAD SAVED MODEL COMPONENTS
+# LOAD MODEL COMPONENTS
 # ==========================================
 @st.cache_resource
 def load_components():
-    base_path = Path(__file__).parent
-
-    model = joblib.load(base_path / "heart_model.pkl")
-    scaler = joblib.load(base_path / "scaler.pkl")
-    selector = joblib.load(base_path / "selector.pkl")
-
+    model = joblib.load(BASE_DIR / "heart_model.pkl")
+    scaler = joblib.load(BASE_DIR / "scaler.pkl")
+    selector = joblib.load(BASE_DIR / "selector.pkl")
     return model, scaler, selector
 
 
@@ -155,7 +153,7 @@ except Exception as e:
 
 
 # ==========================================
-# HERO SECTION AND HEART IMAGE
+# HERO SECTION
 # ==========================================
 hero_text, hero_image = st.columns(
     [1.15, 1],
@@ -165,9 +163,14 @@ hero_text, hero_image = st.columns(
 with hero_text:
     st.markdown("""
     <div style="padding: 20px 5px;">
-        <div class="hero-title">
+        <h1 style="
+            color: #153E75;
+            font-size: 36px;
+            font-weight: 750;
+            line-height: 1.3;
+        ">
             ❤️ Heart Disease Prediction
-        </div>
+        </h1>
 
         <div class="hero-description">
             Your heart continuously pumps blood, supplying
@@ -181,7 +184,7 @@ with hero_text:
     """, unsafe_allow_html=True)
 
 with hero_image:
-    image_path = Path(__file__).parent / "heart_banner.png"
+    image_path = BASE_DIR / "heart_banner.png"
 
     if image_path.exists():
         st.image(
@@ -203,16 +206,15 @@ st.divider()
 st.markdown("## Patient Health Information")
 
 st.write(
-    "Enter the patient details below to generate a "
-    "machine-learning prediction."
+    "Enter the patient's details below to generate "
+    "a machine-learning prediction."
 )
 
-# ==========================================
-# DROPDOWN LABEL MAPPINGS
-# ==========================================
-# These labels use a common UCI Heart Disease encoding.
-# Confirm that your training dataset uses the same encoding.
 
+# ==========================================
+# DROPDOWN LABELS
+# Verify these encodings against your training dataset.
+# ==========================================
 chest_pain_options = {
     "Typical angina (0)": 0,
     "Atypical angina (1)": 1,
@@ -241,7 +243,7 @@ thal_options = {
 
 
 # ==========================================
-# INPUT FORM
+# PATIENT INPUT FORM
 # ==========================================
 with st.form("heart_prediction_form"):
 
@@ -337,65 +339,39 @@ with st.form("heart_prediction_form"):
 # ==========================================
 if submitted:
 
-    # Convert display labels into numeric values
+    # Convert display labels to numeric values
     sex = 1 if sex_label.startswith("Male") else 0
-
     cp = chest_pain_options[cp_label]
-
     fbs = 1 if fbs_label.startswith("Yes") else 0
-
     restecg = restecg_options[restecg_label]
-
     exang = 1 if exang_label.startswith("Yes") else 0
-
     slope = slope_options[slope_label]
-
     thal = thal_options[thal_label]
 
-    # Maintain the original 13 feature columns and order
+    # Preserve the original 13 input features and their order
     columns = [
-        "age",
-        "sex",
-        "cp",
-        "trestbps",
-        "chol",
-        "fbs",
-        "restecg",
-        "thalach",
-        "exang",
-        "oldpeak",
-        "slope",
-        "ca",
-        "thal"
+        "age", "sex", "cp", "trestbps", "chol", "fbs",
+        "restecg", "thalach", "exang", "oldpeak",
+        "slope", "ca", "thal"
     ]
 
     input_data = pd.DataFrame(
         [[
-            age,
-            sex,
-            cp,
-            trestbps,
-            chol,
-            fbs,
-            restecg,
-            thalach,
-            exang,
-            oldpeak,
-            slope,
-            ca,
-            thal
+            age, sex, cp, trestbps, chol, fbs,
+            restecg, thalach, exang, oldpeak,
+            slope, ca, thal
         ]],
         columns=columns
     )
 
     try:
-        # Step 1: Select features from the original input
+        # Step 1: Select features
         input_selected = selector.transform(input_data)
 
         # Step 2: Scale the selected features
         input_scaled = scaler.transform(input_selected)
 
-        # Step 3: Predict using the trained model
+        # Step 3: Predict
         prediction = model.predict(input_scaled)
 
         st.divider()
@@ -413,17 +389,15 @@ if submitted:
             )
 
         st.caption(
-            "For educational purposes only. This prediction "
-            "is not a medical diagnosis and should not replace "
-            "professional medical evaluation."
+            "For educational purposes only. This is not a medical "
+            "diagnosis and does not replace professional evaluation."
         )
 
     except Exception as e:
         st.error(f"Prediction failed: {e}")
-
         st.info(
-            "Verify the feature-selection and scaling order "
-            "against the preprocessing used during model training."
+            "Check the feature selection, scaling order, and feature "
+            "names against the original model training pipeline."
         )
 
 
