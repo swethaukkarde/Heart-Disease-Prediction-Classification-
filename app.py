@@ -4,18 +4,18 @@ import pandas as pd
 import joblib
 from pathlib import Path
 
-# -----------------------------
-# Page Configuration
-# -----------------------------
+# ==========================================
+# PAGE CONFIGURATION
+# ==========================================
 st.set_page_config(
     page_title="Heart Disease Prediction",
     page_icon="❤️",
     layout="wide"
 )
 
-# -----------------------------
-# Light Theme and Styling
-# -----------------------------
+# ==========================================
+# LIGHT THEME AND CSS
+# ==========================================
 st.markdown("""
 <style>
 .stApp {
@@ -33,12 +33,12 @@ header[data-testid="stHeader"] {
     padding-bottom: 3rem;
 }
 
-/* Main headings */
+/* Headings */
 h1, h2, h3 {
     color: #153E75 !important;
 }
 
-/* General text */
+/* Text and labels */
 .stApp p,
 .stApp label,
 .stApp [data-testid="stWidgetLabel"] p,
@@ -49,10 +49,10 @@ h1, h2, h3 {
 /* Hero section */
 .hero-title {
     color: #153E75;
-    font-size: 38px;
+    font-size: 36px;
     font-weight: 750;
-    line-height: 1.2;
-    margin-bottom: 18px;
+    line-height: 1.3;
+    margin-bottom: 16px;
 }
 
 .hero-description {
@@ -61,19 +61,12 @@ h1, h2, h3 {
     line-height: 1.8;
 }
 
-/* Form container */
+/* Form card */
 div[data-testid="stForm"] {
     background-color: #FFFFFF !important;
     border: 1px solid #D6E2F0;
     border-radius: 16px;
     padding: 24px;
-}
-
-/* Input labels */
-div[data-testid="stWidgetLabel"] p {
-    color: #243247 !important;
-    font-size: 15px !important;
-    font-weight: 650 !important;
 }
 
 /* Dropdown fields */
@@ -88,6 +81,17 @@ div[data-baseweb="select"] input {
     color: #243247 !important;
 }
 
+/* Dropdown menu */
+div[data-baseweb="popover"],
+div[data-baseweb="menu"],
+ul[role="listbox"] {
+    background-color: #FFFFFF !important;
+}
+
+li[role="option"] {
+    color: #243247 !important;
+}
+
 /* Number inputs */
 div[data-testid="stNumberInput"] input {
     background-color: #FFFFFF !important;
@@ -95,14 +99,13 @@ div[data-testid="stNumberInput"] input {
     border: 1px solid #CBD5E1 !important;
 }
 
-/* Slider labels and values */
+/* Sliders */
 div[data-testid="stSlider"] label,
 div[data-testid="stSlider"] [data-testid="stMarkdownContainer"] {
     color: #243247 !important;
 }
 
-/* Buttons */
-.stButton > button,
+/* Submit button */
 div[data-testid="stFormSubmitButton"] > button {
     background-color: #1769AA !important;
     color: #FFFFFF !important;
@@ -112,7 +115,6 @@ div[data-testid="stFormSubmitButton"] > button {
     min-height: 44px;
 }
 
-.stButton > button:hover,
 div[data-testid="stFormSubmitButton"] > button:hover {
     background-color: #10528A !important;
     color: #FFFFFF !important;
@@ -131,14 +133,17 @@ footer {
 """, unsafe_allow_html=True)
 
 
-# -----------------------------
-# Load Saved ML Components
-# -----------------------------
+# ==========================================
+# LOAD SAVED MODEL COMPONENTS
+# ==========================================
 @st.cache_resource
 def load_components():
-    model = joblib.load("heart_model.pkl")
-    scaler = joblib.load("scaler.pkl")
-    selector = joblib.load("selector.pkl")
+    base_path = Path(__file__).parent
+
+    model = joblib.load(base_path / "heart_model.pkl")
+    scaler = joblib.load(base_path / "scaler.pkl")
+    selector = joblib.load(base_path / "selector.pkl")
+
     return model, scaler, selector
 
 
@@ -149,9 +154,9 @@ except Exception as e:
     st.stop()
 
 
-# -----------------------------
-# Hero Section
-# -----------------------------
+# ==========================================
+# HERO SECTION AND HEART IMAGE
+# ==========================================
 hero_text, hero_image = st.columns(
     [1.15, 1],
     vertical_alignment="center"
@@ -163,12 +168,13 @@ with hero_text:
         <div class="hero-title">
             ❤️ Heart Disease Prediction
         </div>
+
         <div class="hero-description">
             Your heart continuously pumps blood, supplying
             oxygen and essential nutrients throughout your body.
             <br><br>
             Maintaining heart health through healthy habits
-            and timely medical checkups can help reduce
+            and regular medical checkups can help reduce
             cardiovascular risks.
         </div>
     </div>
@@ -183,18 +189,17 @@ with hero_image:
             use_container_width=True
         )
     else:
-        st.warning(
-            "Heart image not found. Upload heart_banner.png "
-            "to the same folder as app.py."
+        st.info(
+            "Upload heart_banner.png to your GitHub repository "
+            "to display the heart image."
         )
-
 
 st.divider()
 
 
-# -----------------------------
-# Patient Information
-# -----------------------------
+# ==========================================
+# PATIENT HEALTH INFORMATION
+# ==========================================
 st.markdown("## Patient Health Information")
 
 st.write(
@@ -202,6 +207,42 @@ st.write(
     "machine-learning prediction."
 )
 
+# ==========================================
+# DROPDOWN LABEL MAPPINGS
+# ==========================================
+# These labels use a common UCI Heart Disease encoding.
+# Confirm that your training dataset uses the same encoding.
+
+chest_pain_options = {
+    "Typical angina (0)": 0,
+    "Atypical angina (1)": 1,
+    "Non-anginal pain (2)": 2,
+    "Asymptomatic (3)": 3
+}
+
+restecg_options = {
+    "Normal (0)": 0,
+    "ST-T wave abnormality (1)": 1,
+    "Left ventricular hypertrophy (2)": 2
+}
+
+slope_options = {
+    "Upsloping (0)": 0,
+    "Flat (1)": 1,
+    "Downsloping (2)": 2
+}
+
+thal_options = {
+    "Unknown / not specified (0)": 0,
+    "Normal (1)": 1,
+    "Fixed defect (2)": 2,
+    "Reversible defect (3)": 3
+}
+
+
+# ==========================================
+# INPUT FORM
+# ==========================================
 with st.form("heart_prediction_form"):
 
     col1, col2, col3 = st.columns(3)
@@ -214,39 +255,39 @@ with st.form("heart_prediction_form"):
             value=50
         )
 
-        sex_choice = st.selectbox(
+        sex_label = st.selectbox(
             "Sex",
-            ["Female", "Male"]
+            ["Female (0)", "Male (1)"]
         )
 
-        cp = st.selectbox(
+        cp_label = st.selectbox(
             "Chest Pain Type",
-            [0, 1, 2, 3]
+            list(chest_pain_options.keys())
         )
 
         trestbps = st.number_input(
-            "Resting Blood Pressure",
+            "Resting Blood Pressure (mm Hg)",
             min_value=80,
             max_value=200,
             value=120
         )
 
         chol = st.number_input(
-            "Cholesterol",
+            "Cholesterol (mg/dl)",
             min_value=100,
             max_value=600,
             value=200
         )
 
     with col2:
-        fbs = st.selectbox(
+        fbs_label = st.selectbox(
             "Fasting Blood Sugar >120 mg/dl",
-            [0, 1]
+            ["No (0)", "Yes (1)"]
         )
 
-        restecg = st.selectbox(
-            "Rest ECG",
-            [0, 1, 2]
+        restecg_label = st.selectbox(
+            "Resting ECG Result",
+            list(restecg_options.keys())
         )
 
         thalach = st.number_input(
@@ -256,9 +297,9 @@ with st.form("heart_prediction_form"):
             value=150
         )
 
-        exang = st.selectbox(
+        exang_label = st.selectbox(
             "Exercise-Induced Angina",
-            [0, 1]
+            ["No (0)", "Yes (1)"]
         )
 
     with col3:
@@ -270,9 +311,9 @@ with st.form("heart_prediction_form"):
             step=0.1
         )
 
-        slope = st.selectbox(
-            "Slope",
-            [0, 1, 2]
+        slope_label = st.selectbox(
+            "ST Segment Slope",
+            list(slope_options.keys())
         )
 
         ca = st.selectbox(
@@ -280,9 +321,9 @@ with st.form("heart_prediction_form"):
             [0, 1, 2, 3]
         )
 
-        thal = st.selectbox(
-            "Thal",
-            [0, 1, 2, 3]
+        thal_label = st.selectbox(
+            "Thal Test Category",
+            list(thal_options.keys())
         )
 
     submitted = st.form_submit_button(
@@ -291,13 +332,27 @@ with st.form("heart_prediction_form"):
     )
 
 
-# -----------------------------
-# Prediction
-# -----------------------------
+# ==========================================
+# PREDICTION
+# ==========================================
 if submitted:
 
-    sex = 1 if sex_choice == "Male" else 0
+    # Convert display labels into numeric values
+    sex = 1 if sex_label.startswith("Male") else 0
 
+    cp = chest_pain_options[cp_label]
+
+    fbs = 1 if fbs_label.startswith("Yes") else 0
+
+    restecg = restecg_options[restecg_label]
+
+    exang = 1 if exang_label.startswith("Yes") else 0
+
+    slope = slope_options[slope_label]
+
+    thal = thal_options[thal_label]
+
+    # Maintain the original 13 feature columns and order
     columns = [
         "age",
         "sex",
@@ -334,14 +389,14 @@ if submitted:
     )
 
     try:
-        # Scale the input
-        input_scaled = scaler.transform(input_data)
+        # Step 1: Select features from the original input
+        input_selected = selector.transform(input_data)
 
-        # Apply feature selection
-        input_selected = selector.transform(input_scaled)
+        # Step 2: Scale the selected features
+        input_scaled = scaler.transform(input_selected)
 
-        # Generate prediction
-        prediction = model.predict(input_selected)
+        # Step 3: Predict using the trained model
+        prediction = model.predict(input_scaled)
 
         st.divider()
         st.markdown("## Prediction Result")
@@ -358,35 +413,32 @@ if submitted:
             )
 
         st.caption(
-            "Educational use only. This model does not provide "
-            "a medical diagnosis. Consult a qualified healthcare "
-            "professional for medical evaluation."
+            "For educational purposes only. This prediction "
+            "is not a medical diagnosis and should not replace "
+            "professional medical evaluation."
         )
 
     except Exception as e:
         st.error(f"Prediction failed: {e}")
 
         st.info(
-            "Check whether the input features and their order "
-            "match those used to train scaler.pkl and selector.pkl."
+            "Verify the feature-selection and scaling order "
+            "against the preprocessing used during model training."
         )
 
 
-# -----------------------------
-# Footer
-# -----------------------------
+# ==========================================
+# FOOTER
+# ==========================================
 st.divider()
 
-st.markdown(
-    """
-    <div style="
-        text-align: center;
-        color: #64748B;
-        padding: 10px;
-        font-size: 13px;
-    ">
-        Heart Disease Prediction | Machine Learning Project
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div style="
+    text-align: center;
+    color: #64748B;
+    padding: 10px;
+    font-size: 13px;
+">
+    Heart Disease Prediction | Machine Learning Project
+</div>
+""", unsafe_allow_html=True)
